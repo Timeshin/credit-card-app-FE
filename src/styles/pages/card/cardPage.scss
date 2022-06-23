@@ -1,0 +1,14 @@
+.MuiBox-root {
+  height: 100vh;
+  width: 100vw;
+}
+
+.MuiOutlinedInput-root {
+  background: #fff;
+  fieldset {
+    border-color: #fff;
+  }
+  textarea {
+    font-size: 25px;
+  }
+}
