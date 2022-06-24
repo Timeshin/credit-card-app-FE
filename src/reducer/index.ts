@@ -3,6 +3,7 @@ export enum FormValues {
   SetExpDate = 'SetExpDate',
   SetCvv = 'SetCvv',
   SetAmount = 'SetAmount',
+  clear = 'clear',
 }
 
 export interface IStateValue {
@@ -15,11 +16,30 @@ interface IFromValuesAction {
   payload: IStateValue
 }
 
-interface IFormValuesState {
+export interface IFormValuesState {
   cardNumber: IStateValue
   expDate: IStateValue
   cvv: IStateValue
   amount: IStateValue
+}
+
+const initialState = {
+  cardNumber: {
+    value: '',
+    isValid: true
+  },
+  expDate: {
+    value: '',
+    isValid: true
+  },
+  cvv: {
+    value: '',
+    isValid: true
+  },
+  amount: {
+    value: '',
+    isValid: true
+  },
 }
 
 const reducer = (state: IFormValuesState, { type, payload }: IFromValuesAction) => {
@@ -44,6 +64,8 @@ const reducer = (state: IFormValuesState, { type, payload }: IFromValuesAction) 
         ...state,
         amount: payload
       }
+    case FormValues.clear:
+      return state = initialState
     default:
       return {
         ...state

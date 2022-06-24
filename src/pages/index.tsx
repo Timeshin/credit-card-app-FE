@@ -1,6 +1,8 @@
 import React, { useMemo, useReducer, useState } from 'react'
 import Head from 'next/head'
+import sendCreditsCard from 'src/services/services'
 import reducer, { FormValues } from '../reducer/index'
+import { IPostCreditCardRes } from 'src/interfaces/services'
 
 import Input from '../UI/Input'
 import { Box, Grid } from '@mui/material'
@@ -9,6 +11,7 @@ import { cardNumberValidation, cvvValidation, dateValidation } from 'src/helpers
 
 const CardPage = () => {
   const [status, setStatus] = useState<'done' | 'pending' | 'error'>('done')
+  const [response, setResponse] = useState<IPostCreditCardRes['data'] | null>()
   const [state, dispatch] = useReducer(reducer, {
     cardNumber: {
       value: '',
@@ -27,11 +30,27 @@ const CardPage = () => {
       isValid: true
     },
   })
+
   const isFormValid = useMemo(() => {
     const stateValuesArray = Object.values(state)
 
     return stateValuesArray.every(({ isValid, value }) => isValid && value.length)
   }, [state])
+
+  const handleSend = () => {
+    setStatus('pending')
+    sendCreditsCard(state)
+      .then((data) => {
+        setResponse(data)
+      })
+      .catch(() => {
+        setStatus('error')
+      })
+      .finally(() => {
+        setStatus('done')
+        dispatch({ type: FormValues.clear, payload: null })
+      })
+  }
 
   return (
     <>
@@ -109,14 +128,14 @@ const CardPage = () => {
           </Grid>
           <Grid item>
             <LoadingButton
-              onClick={() => {console.log('click')}}
+              onClick={handleSend}
               loading={status === 'pending'}
               loadingIndicator="Loading..."
               variant="outlined"
               disabled={!isFormValid}
               fullWidth
             >
-              Transfer
+              Pay
             </LoadingButton>
           </Grid>
         </Grid>
