@@ -1,6 +1,6 @@
 export interface IPostCreditCardRes {
   data: {
-    id: string
+    RequestId: string
     Amount: string  
   }
 }

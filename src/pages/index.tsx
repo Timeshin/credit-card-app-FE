@@ -1,13 +1,14 @@
-import React, { useMemo, useReducer, useState } from 'react'
+import React, { KeyboardEvent, useMemo, useReducer, useState } from 'react'
 import Head from 'next/head'
 import sendCreditsCard from 'src/services/services'
 import reducer, { FormValues } from '../reducer/index'
 import { IPostCreditCardRes } from 'src/interfaces/services'
 
-import Input from '../UI/Input'
+import Input from '../components/UI/Input'
 import { Box, Grid } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { cardNumberValidation, cvvValidation, dateValidation } from 'src/helpers'
+import ResponseData from 'src/components/ResponseData/ResponseData'
 
 const CardPage = () => {
   const [status, setStatus] = useState<'done' | 'pending' | 'error'>('done')
@@ -37,7 +38,7 @@ const CardPage = () => {
     return stateValuesArray.every(({ isValid, value }) => isValid && value.length)
   }, [state])
 
-  const handleSend = () => {
+  const sendCardCredits = () => {
     setStatus('pending')
     sendCreditsCard(state)
       .then((data) => {
@@ -52,15 +53,21 @@ const CardPage = () => {
       })
   }
 
+  const handleKeyDown = ({ key }: KeyboardEvent<HTMLDivElement>) => {
+    if(key === 'Enter' && isFormValid) {
+      sendCardCredits()
+    }
+  }
+
   return (
     <>
       <Head>
         <title>Payment</title>
-        <link rel="icon" href="./assets/icons/paymentPage.png" />
+        <link rel="icon" href="./assets/images/paymentPage.png" />
         <meta name="description" content='Credit card payment' />
       </Head>
       <Box>
-        <Grid container spacing={2} height='100%' alignItems='center' justifyContent='center' direction='column'>
+        <Grid container spacing={2} alignItems='center' direction='column' onKeyDown={handleKeyDown}>
           <Grid item>
             <Input
               item={state.cardNumber}
@@ -128,7 +135,7 @@ const CardPage = () => {
           </Grid>
           <Grid item>
             <LoadingButton
-              onClick={handleSend}
+              onClick={sendCardCredits}
               loading={status === 'pending'}
               loadingIndicator="Loading..."
               variant="outlined"
@@ -138,6 +145,9 @@ const CardPage = () => {
               Pay
             </LoadingButton>
           </Grid>
+          {
+            response && <ResponseData RequestId={response.RequestId} Amount={response.Amount} />
+          }
         </Grid>
       </Box>
     </>
